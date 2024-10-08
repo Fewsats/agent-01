@@ -1,0 +1,15 @@
+*.pyc
+*__pycache__*
+.venv
+*.env
+.vscode
+talk2apis
+.DS_Store
+
+venv
+papers
+
+examples
+canopy
+neo4j_dl_course
+summarizers

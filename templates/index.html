@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI-Powered Website Q&A Chat</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'chat-bg': '#343541',
+                            'header-bg': '#202123',
+                            'input-bg': '#40414f',
+                            'user-msg': '#10a37f',
+                            'ai-msg': '#444654',
+                            'button-hover': '#1a7f64',
+                        }
+                    }
+                }
+            }
+        </script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    </head>
+    <body class="font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] leading-relaxed bg-chat-bg text-[#ececf1]">
+        <div class="flex flex-col h-screen max-w-3xl mx-auto">
+            <div class="bg-header-bg p-4 text-center shadow-md">
+                <h1 class="text-2xl text-[#ececf1]">Agent 01</h1>
+                <div id="wallet-balance">Wallet Balance: Loading...</div>
+            </div>
+            <div id="chat-history" class="flex-grow overflow-y-auto p-5 flex flex-col"></div>
+            <div class="bg-input-bg p-5 border-t border-[#565869]">
+                <form id="chat-form" class="flex items-center">
+                    <input
+                        type="text"
+                        id="question"
+                        name="question"
+                        required
+                        placeholder="Ask a question about any website..."
+                        class="flex-grow p-3 border border-[#565869] rounded bg-input-bg text-white text-base transition-colors duration-300 focus:outline-none focus:border-user-msg"
+                    />
+                    <button type="submit" class="p-3 bg-user-msg text-white border-none rounded cursor-pointer text-base ml-2.5 transition-colors duration-300 hover:bg-button-hover">Send</button>
+                </form>
+            </div>
+        </div>
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    </body>
+</html>
