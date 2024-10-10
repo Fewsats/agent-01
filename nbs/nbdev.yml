@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "ant"
+  site-url: "https://Fewsats.github.io/ant"
+  description: "ANT tools for AI"
+  repo-branch: main
+  repo-url: "https://github.com/Fewsats/ant"
