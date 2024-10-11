@@ -37,12 +37,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch wallet balance on page load
     fetchWalletBalance();
 
+    // Function to auto-resize textarea
+    function autoResizeTextarea() {
+        questionInput.style.height = 'auto';
+        questionInput.style.height = (questionInput.scrollHeight) + 'px';
+        
+        // Limit to 13 lines
+        const lineHeight = parseInt(window.getComputedStyle(questionInput).lineHeight);
+        const maxHeight = lineHeight * 13;
+        if (questionInput.scrollHeight > maxHeight) {
+            questionInput.style.height = maxHeight + 'px';
+            questionInput.style.overflowY = 'auto';
+        } else {
+            questionInput.style.overflowY = 'hidden';
+        }
+    }
+
+    // Add event listener for input changes
+    questionInput.addEventListener('input', autoResizeTextarea);
+
+    // Handle keydown event for shift+enter
+    questionInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            form.dispatchEvent(new Event('submit'));
+        }
+    });
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const question = questionInput.value.trim();
         questionInput.value = ''; // Clear the input field immediately
-
+        questionInput.style.height = 'auto'; // Reset height
+        
         if (!question) {
             showError('Please enter a question.');
             return;
@@ -78,16 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addMessageToChat(role, content) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('max-w-[80%]', 'mb-5', 'p-3', 'rounded-2xl', 'text-base', 'leading-normal', 'break-words', 'animate-fadeIn');
+        messageElement.classList.add('max-w-[80%]', 'mb-5', 'p-5', 'rounded-2xl', 'text-base', 'leading-normal', 'break-words', 'animate-fadeIn');
         
         if (role === 'user') {
-            messageElement.classList.add('self-end', 'bg-user-msg', 'text-white', 'rounded-br-none');
+            messageElement.classList.add('self-end', 'bg-user-msg', 'text-black', 'rounded-br-none');
             messageElement.textContent = content;
         } else if (role === 'ai') {
-            messageElement.classList.add('self-start', 'bg-ai-msg', 'text-[#ececf1]', 'rounded-bl-none');
+            messageElement.classList.add('self-start', 'bg-white', 'text-black', 'rounded-bl-none');
             messageElement.innerHTML = marked.parse(content);
             messageElement.querySelectorAll('pre code').forEach((block) => {
-                block.classList.add('bg-[#2d2d2d]', 'rounded', 'p-2.5', 'overflow-x-auto', 'font-mono', 'text-sm');
+                block.classList.add('bg-[#2d2d2d]', 'rounded', 'p-2.5', 'overflow-x-auto', 'font-mono', 'text-sm', 'text-white');
                 hljs.highlightElement(block);
             });
             messageElement.querySelectorAll('p').forEach((p) => {
@@ -109,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addLoadingIndicator() {
         const loadingElement = document.createElement('div');
-        loadingElement.classList.add('self-start', 'bg-ai-msg', 'text-[#ececf1]', 'p-3', 'rounded-2xl', 'text-base', 'mb-5', 'rounded-bl-none', 'animate-pulse');
+        loadingElement.classList.add('self-start', 'bg-white', 'text-black', 'p-5', 'rounded-2xl', 'text-base', 'mb-5', 'rounded-bl-none', 'animate-pulse');
         loadingElement.textContent = 'Thinking';
         chatHistory.appendChild(loadingElement);
         scrollToBottom();
@@ -119,4 +147,50 @@ document.addEventListener('DOMContentLoaded', () => {
     function scrollToBottom() {
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
+
+    const sendSmsButton = document.getElementById('send-sms');
+    const accessWebsiteButton = document.getElementById('access-website');
+
+    sendSmsButton.addEventListener('click', () => {
+        sendPrompt("Add this tool l402://api.fewsats.com/v0/gateway/d4a9eff9-991f-4664-ab0e-d9add4597c76/info to send SMS messages.");
+    });
+
+    accessWebsiteButton.addEventListener('click', () => {
+        sendPrompt("Add this tool l402://api.fewsats.com/v0/gateway/f12e5deb-b07b-4af4-a4f2-3fbf076228a9/info to scrape websites.");
+    });
+
+    async function sendPrompt(prompt) {
+        autoResizeTextarea();
+        
+        addMessageToChat('user', prompt);
+        const loadingIndicator = addLoadingIndicator();
+
+        try {
+            const response = await fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: prompt }),
+            });
+
+            const data = await response.json();
+            loadingIndicator.remove();
+
+            if (response.ok) {
+                addMessageToChat('ai', data.answer);
+                console.log('Received balance data:', data.final_balance, data.balance_difference);
+                displayBalanceInfo(data.final_balance, data.balance_difference);
+            } else {
+                showError(data.error || 'An error occurred while processing your request.');
+            }
+        } catch (error) {
+            loadingIndicator.remove();
+            showError(`Network error: ${error.message}. Please check your internet connection and try again.`);
+        }
+
+        questionInput.value = ''; // Clear the input field after sending
+        autoResizeTextarea();
+    }
+
 });
