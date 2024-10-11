@@ -1,140 +1,29 @@
 from flask import Flask, request, jsonify, render_template
-from l402.client import requests
-from l402.client.preimage_provider import AlbyAPI
-from l402.client.credentials import SqliteCredentialsService
+# from l402.client import requests
+# from l402.client.preimage_provider import AlbyAPI
+# from l402.client.credentials import SqliteCredentialsService
 import os
 import logging
+import requests
 from requests import RequestException
 from cosette import Chat
+from ant.core import *
 
-# from tools import get_l402_uri_info, scrape_webpage
-
-# Initialize the Client with necessary services
-requests.configure(
-    preimage_provider=AlbyAPI(api_key=os.getenv("ALBY_TOKEN")),
-    credentials_service=SqliteCredentialsService()
-)
 
 app = Flask(__name__)
-logging.basicConfig(level=logging.DEBUG)
-
-def get_l402_uri_info(uri: str, return_format: str = "JSON") -> dict:
-    """
-    Interprets an L402 URI and returns information about the content.
-
-    Args:
-    uri (str): The L402 URI to describe.
-    return_format (str): The desired return format, either "JSON" or "HTML". Defaults to "JSON".
-
-    Returns:
-    str: A dictionary containing the description of the L402 URI either in JSON or HTML format.
-    """
-    if not uri.startswith("l402://"):
-        raise ValueError("Invalid L402 URI format")
-    
-    http_url = uri.replace("l402://", "https://", 1)
-    response = requests.get(http_url)
-    response.raise_for_status()
-    data = response.json()
-    
-    data["price"] = int(data["pricing"][0]["amount"]) / 100
-    endpoint = data['access']['endpoint']
-    method = data['access']['method'].lower()
-    name = data.get('name', 'unnamed_l402_function')
-    description = data.get('description', 'No description provided')
-    # Create a function with a proper name and docstring
-    def l402_function():
-        """
-        {description}
-
-        This function interacts with an L402 endpoint.
-        Endpoint: {endpoint}
-        Method: {method}
-
-        Returns:
-        dict: The JSON response from the endpoint.
-        """
-        request_func = getattr(requests, method)
-        response = request_func(endpoint)
-        response.raise_for_status()
-        return response.json()
-
-    # Set the function name and docstring
-    l402_function.__name__ = name.replace(" ", "_").lower()
-    l402_function.__doc__ = l402_function.__doc__.format(
-        description=description,
-        endpoint=endpoint,
-        method=method.upper()
-    )
-
-    # # Add the new function to the tools list
-    tools.append(l402_function)
-
-    return data
-
-def add_l402_tool(uri: str) -> None:
-    """
-    Creates a new function based on the L402 URI information and adds it to the tools list.
-
-    Args:
-    uri (str): The L402 URI to interpret and create a function from.
-
-    Returns:
-    dict: The information of the L402 tool added.
-    """
-    if not uri.startswith("l402://"):
-        raise ValueError("Invalid L402 URI format")
-    
-    http_url = uri.replace("l402://", "https://", 1)
-    response = requests.get(http_url)
-    response.raise_for_status()
-    data = response.json()
-
-    endpoint = data['access']['endpoint']
-    method = data['access']['method'].lower()
-    name = data.get('name', 'unnamed_l402_function')
-    description = data.get('description', 'No description provided')
-
-    # # Create a function with a proper name and docstring
-    # def l402_function(*args, **kwargs):
-    #     """
-    #     {description}
-
-    #     This function interacts with an L402 endpoint.
-    #     Endpoint: {endpoint}
-    #     Method: {method}
-
-    #     Args:
-    #     *args: Positional arguments to pass to the endpoint.
-    #     **kwargs: Keyword arguments to pass to the endpoint.
-
-    #     Returns:
-    #     dict: The JSON response from the endpoint.
-    #     """
-    #     request_func = getattr(requests, method)
-    #     response = request_func(endpoint, *args, **kwargs)
-    #     response.raise_for_status()
-    #     return response.json()
-
-    # # Set the function name and docstring
-    # l402_function.__name__ = name.replace(" ", "_").lower()
-    # l402_function.__doc__ = l402_function.__doc__.format(
-    #     description=description,
-    #     endpoint=endpoint,
-    #     method=method.upper()
-    # )
-
-    # # Add the new function to the tools list
-    # tools.append(l402_function)
-
-    return data
+logging.basicConfig(level=logging.INFO)
+tools = []
 
 
+def add_l402_tool(uri: str) -> str:
+    """Add a new tool to the agent's toolset."""
+    info = get_l402_uri_info(uri)
+    r = generate_python_function(info)
+    func_code = extract_function_code(get_text(r))
 
-tools = [get_l402_uri_info]
-# tools = [scrape_webpage, get_l402_uri_info]
-
-
+    cf = create_func(func_code)
+    tools.append(cf)
+    return f"tool {cf.__name__} added"
 
 @app.route("/")
 def index():
@@ -146,6 +35,8 @@ def get_wallet_balance():
     response.raise_for_status()
     balance_data = response.json()
     return balance_data.get('balance', 0)
+
+def pchoice(r): print(r.choices[0]) # this function will print the choices made by the agent
 
 @app.route("/ask", methods=["POST"])
 def ask():
@@ -159,15 +50,13 @@ def ask():
         # Fetch initial balance
         initial_balance = get_wallet_balance()
         # Initialize Cosette Chat
-        sp = """You are a helpful assistant that can scrape URLs provided by the user to answer questions.
-                Do not try to guess URLs to scrape. Only scrape URLs that are literally included in the conversation.
-                When a user provides an L402 URI, return the description of the URI in HTML format without any additional text."""
+        sp = """You are a helpful assistant that can add new tools to help users accomplish actions and get information. 
+        When a user provides an L402 URI, you should add it as a tool right away. If you do not have any tools, please say so."""
         model = "gpt-4o"
         chat = Chat(model, sp=sp, tools=tools)
-        logging.info(f"Chat initialized with tools: {tools}")
 
         # Use Cosette's Chat with tool loop
-        response = chat.toolloop(question)
+        response = chat.toolloop(question, trace_func=pchoice)
 
         # Fetch final balance
         final_balance = get_wallet_balance()
@@ -196,4 +85,5 @@ def get_balance():
         return jsonify({"error": "An error occurred while fetching the balance"}), 500
 
 if __name__ == "__main__":
+    tools.append(add_l402_tool)
     app.run(host="0.0.0.0", port=5000, threaded=False)
