@@ -9,5 +9,4 @@ d = { 'settings': { 'branch': 'main',
                           'ant.core.create_func': ('core.html#create_func', 'ant/core.py'),
                           'ant.core.extract_function_code': ('core.html#extract_function_code', 'ant/core.py'),
                           'ant.core.generate_python_function': ('core.html#generate_python_function', 'ant/core.py'),
-                          'ant.core.get_l402_uri_info': ('core.html#get_l402_uri_info', 'ant/core.py'),
-                          'ant.core.get_text': ('core.html#get_text', 'ant/core.py')}}}
+                          'ant.core.get_l402_uri_info': ('core.html#get_l402_uri_info', 'ant/core.py')}}}
