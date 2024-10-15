@@ -151,12 +151,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendSmsButton = document.getElementById('send-sms');
     const accessWebsiteButton = document.getElementById('access-website');
 
+    function setPrompt(prompt) {
+        questionInput.value += (questionInput.value ? '\n' : '') + prompt;
+        autoResizeTextarea();
+    }
+
     sendSmsButton.addEventListener('click', () => {
-        sendPrompt("Add this tool l402://api.fewsats.com/v0/gateway/d4a9eff9-991f-4664-ab0e-d9add4597c76/info to send SMS messages.");
+        setPrompt("Add this tool l402://api.fewsats.com/v0/gateway/d4a9eff9-991f-4664-ab0e-d9add4597c76/info to send SMS messages.");
     });
 
     accessWebsiteButton.addEventListener('click', () => {
-        sendPrompt("Add this tool l402://api.fewsats.com/v0/gateway/f12e5deb-b07b-4af4-a4f2-3fbf076228a9/info to scrape websites.");
+        setPrompt("Add this tool l402://api.fewsats.com/v0/gateway/f12e5deb-b07b-4af4-a4f2-3fbf076228a9/info to scrape websites.");
     });
 
     async function sendPrompt(prompt) {
