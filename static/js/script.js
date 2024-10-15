@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
         langPrefix: 'hljs language-'
     });
 
+    let conversationHistory = [];
+
     function displayBalanceInfo(finalBalance, balanceDifference) {
         console.log('Displaying balance info:', finalBalance, balanceDifference);
         const costDisplay = balanceDifference > 0 ? ` <span class="text-red-500 ml-1">(-${balanceDifference} sats)</span>` : '';
@@ -85,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ question }),
+                body: JSON.stringify({ question: question }),
             });
 
             const data = await response.json();
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addMessageToChat(role, content) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('max-w-[80%]', 'mb-5', 'p-5', 'rounded-2xl', 'text-base', 'leading-normal', 'break-words', 'animate-fadeIn');
+        messageElement.classList.add('max-w-[80%]', 'mb-5', 'p-5', 'rounded-2xl', 'text-base', 'leading-normal', 'break-words', 'animate-fadeIn', 'whitespace-pre-wrap');
         
         if (role === 'user') {
             messageElement.classList.add('self-end', 'bg-user-msg', 'text-black', 'rounded-br-none');
@@ -125,6 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         chatHistory.appendChild(messageElement);
         scrollToBottom();
+
+        conversationHistory.push({ role, content });
     }
 
     function showError(message) {
@@ -152,16 +156,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const accessWebsiteButton = document.getElementById('access-website');
 
     function setPrompt(prompt) {
-        questionInput.value += (questionInput.value ? '\n' : '') + prompt;
+        const currentValue = questionInput.value;
+        const separator = currentValue && !currentValue.endsWith('\n') ? '\n' : '';
+        questionInput.value = currentValue + separator + prompt;
         autoResizeTextarea();
+        questionInput.focus();
     }
 
     sendSmsButton.addEventListener('click', () => {
-        setPrompt("Add this tool l402://api.fewsats.com/v0/gateway/d4a9eff9-991f-4664-ab0e-d9add4597c76/info to send SMS messages.");
+        setPrompt("Tool to send SMS: l402://api.fewsats.com/v0/gateway/d4a9eff9-991f-4664-ab0e-d9add4597c76/info");
     });
 
     accessWebsiteButton.addEventListener('click', () => {
-        setPrompt("Add this tool l402://api.fewsats.com/v0/gateway/f12e5deb-b07b-4af4-a4f2-3fbf076228a9/info to scrape websites.");
+        setPrompt("Tool to scrape websites: l402://api.fewsats.com/v0/gateway/f12e5deb-b07b-4af4-a4f2-3fbf076228a9/info");
     });
 
     async function sendPrompt(prompt) {

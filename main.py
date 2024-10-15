@@ -6,20 +6,21 @@ import os
 import logging
 import requests
 from requests import RequestException
-from cosette import Chat
+from cosette import *
 from ant.core import *
 
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
-tools = []
 
+tools = []
+history = []
 
 def add_l402_tool(uri: str) -> str:
     """Add a new tool to the agent's toolset."""
     info = get_l402_uri_info(uri)
     r = generate_python_function(info)
-    func_code = extract_function_code(get_text(r))
+    func_code = extract_function_code(contents(r))
 
     cf = create_func(func_code)
     tools.append(cf)
@@ -40,6 +41,7 @@ def pchoice(r): print(r.choices[0]) # this function will print the choices made 
 
 @app.route("/ask", methods=["POST"])
 def ask():
+    global history  # Add this line
     data = request.json
     question = data.get("question")
 
@@ -51,12 +53,17 @@ def ask():
         initial_balance = get_wallet_balance()
         # Initialize Cosette Chat
         sp = """You are a helpful assistant that can add new tools to help users accomplish actions and get information. 
-        When a user provides an L402 URI, you should add it as a tool right away. If you do not have any tools, please say so."""
+        When a user provides an L402 URI, you should add it as a tool right away. If you do not have any tools, say so if the user asks."""
         model = "gpt-4o"
         chat = Chat(model, sp=sp, tools=tools)
+        chat.h = history
 
-        # Use Cosette's Chat with tool loop
+        print("Received question:", question)
+        # Use Cosette's Chat with tool loop, including the conversation history
         response = chat.toolloop(question, trace_func=pchoice)
+
+        # Update the conversation history
+        history = chat.h
 
         # Fetch final balance
         final_balance = get_wallet_balance()
