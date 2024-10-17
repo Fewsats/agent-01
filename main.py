@@ -53,7 +53,8 @@ def ask():
         initial_balance = get_wallet_balance()
         # Initialize Cosette Chat
         sp = """You are a helpful assistant that can add new tools to help users accomplish actions and get information. 
-        When a user provides an L402 URI, you should add it as a tool right away. If you do not have any tools, say so if the user asks."""
+        When a user provides an L402 URI, you should add it as a tool right away. If you do not have any tools, say so if the user asks.
+        Do not invent data."""
         model = "gpt-4o"
         chat = Chat(model, sp=sp, tools=tools)
         chat.h = history
