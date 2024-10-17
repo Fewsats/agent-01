@@ -21,7 +21,7 @@ idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.4
 jiter==0.6.1
-l402==0.0.8
+l402==0.0.9
 llms-txt==0.0.4
 MarkupSafe==3.0.1
 oauthlib==3.2.2
