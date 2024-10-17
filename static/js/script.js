@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayBalanceInfo(finalBalance, balanceDifference, currency) {
         console.log('Displaying balance info:', finalBalance, balanceDifference, currency);
-        const costDisplay = balanceDifference > 0 ? ` <span class="text-red-500 ml-1">(-${balanceDifference.toFixed(2)} ${currency})</span>` : '';
-        walletBalanceElement.innerHTML = `Wallet Balance: ${finalBalance.toFixed(2)} ${currency} ${costDisplay}`;
+        const costDisplay = balanceDifference > 0 ? ` <span class="text-red-500 ml-1">(-${balanceDifference.toFixed(2)})</span>` : '';
+        walletBalanceElement.innerHTML = `Wallet Balance: $${finalBalance.toFixed(2)} ${costDisplay}`;
     }
 
     async function fetchWalletBalance() {

@@ -7,6 +7,8 @@ d = { 'settings': { 'branch': 'main',
                 'lib_path': 'ant'},
   'syms': { 'ant.core': { 'ant.core.add_l402_tool': ('core.html#add_l402_tool', 'ant/core.py'),
                           'ant.core.create_func': ('core.html#create_func', 'ant/core.py'),
+                          'ant.core.default_l402_config': ('core.html#default_l402_config', 'ant/core.py'),
                           'ant.core.extract_function_code': ('core.html#extract_function_code', 'ant/core.py'),
+                          'ant.core.func_generation_sp': ('core.html#func_generation_sp', 'ant/core.py'),
                           'ant.core.generate_python_function': ('core.html#generate_python_function', 'ant/core.py'),
                           'ant.core.get_l402_uri_info': ('core.html#get_l402_uri_info', 'ant/core.py')}}}

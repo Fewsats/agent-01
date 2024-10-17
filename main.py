@@ -15,6 +15,7 @@ logging.basicConfig(level=logging.INFO)
 tools = []
 history = []
 
+
 def add_l402_tool(uri: str) -> str:
     """Add a new tool to the agent's toolset."""
     info = get_l402_uri_info(uri)
