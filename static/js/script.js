@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayBalanceInfo(finalBalance, balanceDifference) {
         console.log('Displaying balance info:', finalBalance, balanceDifference);
         const costDisplay = balanceDifference > 0 ? ` <span class="text-red-500 ml-1">(-${balanceDifference} sats)</span>` : '';
-        walletBalanceElement.innerHTML = `Wallet Balance: ${finalBalance} sats${costDisplay}`;
+        walletBalanceElement.innerHTML = `Wallet Balance: $${finalBalance} ${costDisplay}`;
     }
 
     async function fetchWalletBalance(lastCallCost = 0) {
