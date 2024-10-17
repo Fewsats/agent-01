@@ -31,10 +31,10 @@ def index():
     return render_template("index.html")
 
 def get_wallet_balance():
-    API_KEY = os.getenv('HUB_API_TOKEN')
+    API_KEY = os.getenv('HUB_API_KEY')
 
     if not API_KEY:
-        logging.error("HUB_API_TOKEN environment variable is not set")
+        logging.error("HUB_API_KEY environment variable is not set")
         raise ValueError("API key not found in environment variables")
 
     headers = {
