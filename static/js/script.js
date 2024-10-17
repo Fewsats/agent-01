@@ -154,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sendSmsButton = document.getElementById('send-sms');
     const accessWebsiteButton = document.getElementById('access-website');
+    const ghRepoInfoButton = document.getElementById('github-repo-info');
 
     function setPrompt(prompt) {
         const currentValue = questionInput.value;
@@ -169,6 +170,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     accessWebsiteButton.addEventListener('click', () => {
         setPrompt("Tool to scrape websites: l402://api.fewsats.com/v0/gateway/f12e5deb-b07b-4af4-a4f2-3fbf076228a9/info");
+    });
+
+
+    ghRepoInfoButton.addEventListener('click', () => {
+        setPrompt("Tool to get github repo info: l402://api.fewsats.com/v0/gateway/b0b8c48e-10fb-4a8d-a644-01946189212f/info");
     });
 
     async function sendPrompt(prompt) {
