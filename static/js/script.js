@@ -14,19 +14,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let conversationHistory = [];
 
-    function displayBalanceInfo(finalBalance, balanceDifference) {
-        console.log('Displaying balance info:', finalBalance, balanceDifference);
-        const costDisplay = balanceDifference > 0 ? ` <span class="text-red-500 ml-1">(-${balanceDifference} sats)</span>` : '';
-        walletBalanceElement.innerHTML = `Wallet Balance: $${finalBalance} ${costDisplay}`;
+    function displayBalanceInfo(finalBalance, balanceDifference, currency) {
+        console.log('Displaying balance info:', finalBalance, balanceDifference, currency);
+        const costDisplay = balanceDifference > 0 ? ` <span class="text-red-500 ml-1">(-${balanceDifference.toFixed(2)} ${currency})</span>` : '';
+        walletBalanceElement.innerHTML = `Wallet Balance: ${finalBalance.toFixed(2)} ${currency} ${costDisplay}`;
     }
 
-    async function fetchWalletBalance(lastCallCost = 0) {
+    async function fetchWalletBalance() {
         try {
             const response = await fetch('/get_balance');
             const data = await response.json();
             if (response.ok) {
-                console.log('Fetched balance:', data.balance);
-                displayBalanceInfo(data.balance, lastCallCost);
+                console.log('Fetched balance:', data.balance, data.currency);
+                displayBalanceInfo(data.balance, 0, data.currency);
             } else {
                 walletBalanceElement.textContent = 'Wallet Balance: Error fetching balance';
             }
@@ -95,8 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 addMessageToChat('ai', data.answer);
-                console.log('Received balance data:', data.final_balance, data.balance_difference);
-                displayBalanceInfo(data.final_balance, data.balance_difference);
+                console.log('Received balance data:', data.final_balance, data.balance_difference, data.currency);
+                displayBalanceInfo(data.final_balance, data.balance_difference, data.currency);
             } else {
                 showError(data.error || 'An error occurred while processing your request.');
             }
@@ -191,8 +191,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 addMessageToChat('ai', data.answer);
-                console.log('Received balance data:', data.final_balance, data.balance_difference);
-                displayBalanceInfo(data.final_balance, data.balance_difference);
+                console.log('Received balance data:', data.final_balance, data.balance_difference, data.currency);
+                displayBalanceInfo(data.final_balance, data.balance_difference, data.currency);
             } else {
                 showError(data.error || 'An error occurred while processing your request.');
             }

@@ -1,7 +1,4 @@
 from flask import Flask, request, jsonify, render_template
-# from l402.client import requests
-# from l402.client.preimage_provider import AlbyAPI
-# from l402.client.credentials import SqliteCredentialsService
 import os
 import logging
 import requests
@@ -14,7 +11,6 @@ WALLETS_ENDPOINT = "/v0/wallets"
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
-
 
 tools = []
 history = []
@@ -58,7 +54,8 @@ def get_wallet_balance():
         raise ValueError("No wallets found")
 
 
-def pchoice(r): print(r.choices[0]) # this function will print the choices made by the agent
+def pchoice(r): 
+    logging.info(f"Agent choice: {r.choices[0]}")
 
 @app.route("/ask", methods=["POST"])
 def ask():
@@ -80,7 +77,7 @@ def ask():
         chat = Chat(model, sp=sp, tools=tools)
         chat.h = history
 
-        print("Received question:", question)
+        logging.info(f"Received question: {question}")
         # Use Cosette's Chat with tool loop, including the conversation history
         response = chat.toolloop(question, trace_func=pchoice)
 
@@ -101,7 +98,7 @@ def ask():
             "currency": currency
         })
     except Exception as e:
-        logging.error(f"Error in ask: {str(e)}")
+        logging.error(f"Error in ask: {str(e)}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 @app.route("/get_balance", methods=["GET"])
@@ -111,7 +108,7 @@ def get_balance():
         app.logger.info(f"Successfully fetched balance: {balance/100} {currency}")
         return jsonify({"balance": balance/100, "currency": currency})
     except RequestException as e:
-        app.logger.error(f"Error fetching balance: {str(e)}")
+        app.logger.error(f"Error fetching balance: {str(e)}", exc_info=True)
         return jsonify({"error": "An error occurred while fetching the balance"}), 500
 
 if __name__ == "__main__":
