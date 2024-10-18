@@ -4,6 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const questionInput = document.getElementById('question');
     const walletBalanceElement = document.getElementById('wallet-balance');
 
+    // Generate a random session ID
+    function generateSessionId() {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+
+    const sessionId = generateSessionId();
+
     marked.setOptions({
         highlight: function(code, lang) {
             const language = hljs.getLanguage(lang) ? lang : 'plaintext';
@@ -86,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Session-ID': sessionId
                 },
                 body: JSON.stringify({ question: question }),
             });
