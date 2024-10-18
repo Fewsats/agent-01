@@ -11,7 +11,7 @@ from functools import wraps
 HUB_URL = "https://hub-5n97k.ondigitalocean.app"
 WALLETS_ENDPOINT = "/v0/wallets"
 
-MAX_ITEMS = 100
+MAX_ITEMS = 1000
 user_history = LRUCache(maxsize=MAX_ITEMS)
 user_tools = LRUCache(maxsize=MAX_ITEMS)
 
