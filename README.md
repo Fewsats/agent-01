@@ -1,12 +1,17 @@
 # Dynamic AI Assistant with L402 URI Tools
 
-This project implements a dynamic AI assistant that can add new tools on-the-fly using L402 URIs. 
+This project implements a dynamic AI assistant that can add new tools on-the-fly using L402 URIs and pay for them.
 
-Here you have a video demo:
-
-https://x.com/positiveblue2/status/1846925166149865829
+You can see a video demo here: https://x.com/positiveblue2/status/1846925166149865829
 
 Try it yourself: https://agent-01-pol-avec.replit.app/
+
+
+![Agent 01 Demo](agent-01-demo.png)
+
+
+
+
 ## How It Works
 
 The main application (`main.py`) uses Flask to create a web server that hosts an AI assistant. Here are the key components:
@@ -56,24 +61,13 @@ The AI assistant is powered by the Cosette library and uses the GPT-4 model. It 
 Tools have a cost so the assistant integrates with a wallet to be able to pay for the tools used during the interaction. The wallet being used currently is provided by [Hub](https://paywithhub.com/). You just need to export the environment variable `HUB_API_KEY` with your API key, and make sure to either have funds or a card added. Beware the minimum amount the Hub can charge is $20, the rest remains as balance.
 
 
-## Why Dynamic Tools are Cool
-
-1. **Extensibility**: The assistant can gain new capabilities without requiring a restart or code changes.
-2. **Customization**: Users can add specific tools tailored to their needs.
-3. **Pay-per-use Model**: L402 URIs enable a pay-per-use model for accessing specialized tools or data.
-
-## L402 URIs
-
-L402 URIs are a protocol for internet-native, machine-friendly paywalls. They allow the assistant to access paid resources or tools on-demand, expanding its capabilities based on the user's needs.
-
 ## Requirements
 
 - A Hub account is currently required to use this application.
-- The `HUB_API_TOKEN` environment variable must be set with your Hub API key.
+- The `HUB_API_KEY` environment variable must be set with your Hub API key.
 
 ## Setup and Running
 
-1. Install the required dependencies (Flask, requests, cosette, etc.).
+1. Install the required dependencies `pip install -r requirements.txt`
 2. Set the `HUB_API_KEY` & `OPENAI_API_KEY` environment variables.
 3. Run the application `python main.py`
-
