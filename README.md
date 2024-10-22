@@ -4,7 +4,7 @@ This project implements a dynamic AI assistant that can add new tools on-the-fly
 
 You can see a video demo here: https://x.com/positiveblue2/status/1846925166149865829
 
-Try it yourself: https://agent-01-pol-avec.replit.app/
+Try it yourself: https://agent-01.replit.app/
 
 
 ![Agent 01 Demo](agent-01-demo.png)
